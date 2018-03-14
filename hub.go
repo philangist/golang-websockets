@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 
+    "github.com/philangist/golang-draw/message"
 	"github.com/gorilla/websocket"
-	"github.com/tidwall/json"
+	"github.com/tidwall/gjson"
 )
 
 type Hub struct {
@@ -26,9 +27,9 @@ func newHub() *Hub {
 func (hub *Hub) run() {
 	for {
 		select {
-		case client = <-hub.register:
+		case client := <-hub.register:
 			hub.onConnect(client)
-		case client = <-hub.unregister:
+		case client := <-hub.unregister:
 			hub.onDisconnect(client)
 		}
 	}
@@ -102,12 +103,17 @@ func (hub *Hub) onMessage(data []byte, client *Client) {
 	kind := gjson.GetBytes(data, "kind").Int()
 	if kind == message.KindStroke {
 		var msg message.Stroke
-		if json.Unmarsha(data, &msg) != nil {
+		if json.Unmarshal(data, &msg) != nil {
 			return
 		}
 		msg.UserID = client.id
 		hub.broadcast(msg, client)
-	} else if kind == message.ClearStroke {
-
+	} else if kind == message.KindClear {
+        var msg message.Clear
+        if json.Unmarshal(data, &msg) != nil {
+            return
+        }
+        msg.UserID = client.id
+        hub.broadcast(msg, client)
 	}
 }

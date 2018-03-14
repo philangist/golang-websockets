@@ -2,7 +2,7 @@ package main
 
 import (
     "github.com/gorilla/websocket"
-    uuid "github.com/satori/go.uuid"
+    // uuid "github.com/satori/go.uuid"
 )
 
 type Client struct {
@@ -15,7 +15,7 @@ type Client struct {
 
 func newClient(hub *Hub, socket *websocket.Conn) *Client {
     return &Client{
-        id:       uuid.NewV4().String(),
+        id:       "uuid.NewV4().String()",
         hub:      hub,
         color:    generateColor(),
         socket:   socket,
